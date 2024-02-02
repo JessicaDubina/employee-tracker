@@ -22,11 +22,43 @@ const db = mysql.createConnection(
     console.log(`Connected to the books_db database.`)
   );
 
+//path to landing questions
 const init = () => {
     app.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, '/api/index.js'));
     })
 }
+
+//handle get request for department table
+app.get('/departments', (req, res) => {
+  const sql = `SELECT * FROM department`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+  //after displaying - should route back to landing questions
+});
+
+//handler for roles table
+app.get('/roles', (req, res) => {
+  const sql = `SELECT * FROM roles`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
 
 init();
 
