@@ -4,28 +4,26 @@ CREATE DATABASE staff_db;
 USE staff_db;
 
 CREATE TABLE department (
-    id INT NOT NULL,
-    name VARCHAR(25) NOT NULL,
-    PRIMARY KEY (id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(25) NOT NULL
 );
 
 CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     job_title VARCHAR(30) NOT NULL,
-    id INT NOT NULL,
     department_id INT,
     salary INT NOT NULL,
     FOREIGN KEY (department_id)
     REFERENCES department(id)
-    ON DELETE SET NULL,
-    PRIMARY KEY (id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE employees (
-    id INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
     role_id INT,
-    manager VARCHAR(30) NOT NULL,
+    manager VARCHAR(30),
     FOREIGN KEY (role_id)
     REFERENCES roles(id)
     ON DELETE SET NULL
