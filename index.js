@@ -28,8 +28,13 @@ inquirer.prompt([
             selection = 'department';
             method = 'GET';
             break;
+        case 'View all roles':
+            selection = 'roles';
+            method = 'GET';
+            break;  
         case 'View all employees':
-            //get employees table
+            selection = 'employees';
+            method = 'GET';
             break;
         case 'Add a department':
             //post to department table

@@ -1,7 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
-// const api = require('./api/index.js');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3001;
@@ -9,7 +8,6 @@ const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-// app.use('/api', api);
 
 //connect to the database
 const db = mysql.createConnection(
@@ -43,11 +41,22 @@ app.get('/roles', (req, res) => {
       res.status(500).json({ error: err.message });
        return;
     }
-    res.json({
-      message: 'success',
-      data: rows
-    });
+    res.send(rows);
   });
+  //route back to landing
+});
+
+//handler for employees table
+app.get('/employees', (req, res) => {
+  const sql = `SELECT * FROM employees`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.send(rows);
+  });
+  //route back to landing
 });
 
 app.listen(PORT, () =>
