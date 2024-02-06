@@ -4,25 +4,23 @@ const path = require('path');
 
 const app = express();
 
-inquirer.prompt([
-    {
-        type: 'list',
-        name: 'mainMenuSelect',
-        message: 'What would you like to do?',
-        choices: [
-            'View all departments', 
-            'View all roles', 
-            'View all employees',
-            'Add a department',
-            'Add a role',
-            'Add an employee',
-            'Update an employee role'
-        ]
-    }
-])
-.then((answer) => {
-    let selection = '';
-    let method = '';
+async function mainMenu() {
+    const answer = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'mainMenuSelect',
+            message: 'What would you like to do?',
+            choices: [
+                'View all departments', 
+                'View all roles', 
+                'View all employees',
+                'Add a department',
+                'Add a role',
+                'Add an employee',
+                'Update an employee role'
+            ]
+        }
+    ])
     switch(answer.mainMenuSelect) {
         case 'View all departments':
             selection = 'department';
@@ -37,6 +35,9 @@ inquirer.prompt([
             method = 'GET';
             break;
         case 'Add a department':
+            let deptName = await addDepartment();
+            selection =`department:${deptName}`
+            method = 'POST'
             //post to department table
             break;
         case 'Add a role':
@@ -52,7 +53,7 @@ inquirer.prompt([
         default:
             console.log('Please pick a valid option');
             return;
-    }
+    }        
     fetch(`http://localhost:3001/${selection}`, {
         method: `${method}`,
         headers: {
@@ -71,6 +72,19 @@ inquirer.prompt([
     .catch(error => {
         console.error(error);
     })
-})
+}
+
+const addDepartment = async () => {
+    const deptName = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'newDepartment',
+            message: 'Please enter the new department name'
+        }
+    ])
+    return deptName;
+}
+
+mainMenu();
 
 module.exports = app;
