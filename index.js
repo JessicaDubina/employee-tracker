@@ -5,79 +5,87 @@ const path = require('path');
 const app = express();
 
 async function mainMenu() {
-    const answer = await inquirer.prompt([
-        {
-            type: 'list',
-            name: 'mainMenuSelect',
-            message: 'What would you like to do?',
-            choices: [
-                'View all departments', 
-                'View all roles', 
-                'View all employees',
-                'Add a department',
-                'Add a role',
-                'Add an employee',
-                'Update an employee role'
-            ],
-            loop: true
-        }
-    ])
-    switch(answer.mainMenuSelect) {
-        case 'View all departments':
-            selection = 'department';
-            method = 'GET';
-            break;
-        case 'View all roles':
-            selection = 'roles';
-            method = 'GET';
-            break;  
-        case 'View all employees':
-            selection = 'employees';
-            method = 'GET';
-            break;
-        case 'Add a department':
-            let deptName = await addDepartment();
-            selection =`department/${deptName}`
-            method = 'POST'
-            break;
-        case 'Add a role':
-            let newRole = await addRole();
-            selection = `roles/${newRole.role}/${newRole.roleDept}/${newRole.salary}`;
-            method = `POST`;
-            break;
-        case 'Add an employee':
-            let newEmp = await addEmployee();
-            selection = `employees/${newEmp.fName}/${newEmp.lName}/${newEmp.roleEmp}/${newEmp.manager}`;
-            method = `POST`;
-            break;
-        case 'Update an employee role':
-            let empNewRole = await updateEmployeeRole();
-            const {firstName, lastName} = splitName(empNewRole.employee);
-            selection = `employees/${firstName}/${lastName}/${empNewRole.roleEmp}`;
-            method = `PUT`;
-            break;
-        default:
-            console.log('Please pick a valid option');
-            return;
-    }        
-    fetch(`http://localhost:3001/${selection}`, {
-        method: `${method}`,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then((response) => {
-        if (!response.ok) {
-            console.log('HTTP error');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.table(data);
-    })
-    .catch(error => {
-        console.error(error);
-    })
+    let exitloop = false;
+    while (!exitloop) {
+        console.clear();
+        const answer = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'mainMenuSelect',
+                message: 'What would you like to do?',
+                choices: [
+                    'View all departments', 
+                    'View all roles', 
+                    'View all employees',
+                    'Add a department',
+                    'Add a role',
+                    'Add an employee',
+                    'Update an employee role',
+                    'Exit'
+                ],
+                loop: true
+            }
+        ])
+        switch(answer.mainMenuSelect) {
+            case 'View all departments':
+                selection = 'department';
+                method = 'GET';
+                break;
+            case 'View all roles':
+                selection = 'roles';
+                method = 'GET';
+                break;  
+            case 'View all employees':
+                selection = 'employees';
+                method = 'GET';
+                break;
+            case 'Add a department':
+                let deptName = await addDepartment();
+                selection =`department/${deptName}`
+                method = 'POST'
+                break;
+            case 'Add a role':
+                let newRole = await addRole();
+                selection = `roles/${newRole.role}/${newRole.roleDept}/${newRole.salary}`;
+                method = `POST`;
+                break;
+            case 'Add an employee':
+                let newEmp = await addEmployee();
+                selection = `employees/${newEmp.fName}/${newEmp.lName}/${newEmp.roleEmp}/${newEmp.manager}`;
+                method = `POST`;
+                break;
+            case 'Update an employee role':
+                let empNewRole = await updateEmployeeRole();
+                const {firstName, lastName} = splitName(empNewRole.employee);
+                selection = `employees/${firstName}/${lastName}/${empNewRole.roleEmp}`;
+                method = `PUT`;
+                break;
+            case 'Exit':
+                exitloop = true;
+                break;
+            default:
+                console.log('Please pick a valid option');
+                return;
+        }        
+        fetch(`http://localhost:3001/${selection}`, {
+            method: `${method}`,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            if (!response.ok) {
+                console.log('HTTP error');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.table(data);
+        })
+        .catch(error => {
+            console.error(error);
+        })
+    }
 }
 
 const addDepartment = async () => {
