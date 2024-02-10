@@ -30,7 +30,6 @@ app.get('/department', (req, res) => {
     }
     res.send(rows);
   });
-  //after displaying - should route back to landing questions
 });
 
 //handler for roles table
@@ -43,7 +42,6 @@ app.get('/roles', (req, res) => {
     }
     res.send(rows);
   });
-  //route back to landing
 });
 
 //handler for employees table
@@ -56,7 +54,6 @@ app.get('/employees', (req, res) => {
     }
     res.send(rows);
   });
-  //route back to landing
 });
 
 //handler for adding a department
@@ -70,7 +67,6 @@ app.post(`/department/:name`, (req, res) => {
     }
     res.json(`Successfully added ${param}`);
   });
-  //route back to landing
 });
 
 //handler for adding a role
@@ -97,7 +93,6 @@ app.post(`/roles/:role/:department/:salary`, (req, res) => {
       });
 
   });
-  //route back to landing
 });
 
 //handler for adding an employee
@@ -110,7 +105,7 @@ app.post(`/employees/:fname/:lname/:role/:manager`, async (req, res) => {
   
   try {
     const roleId = await getRoleId(role);
-    const mId = await getMrgId(manager);
+    const mId = await getMgrId(manager);
 
     db.query(sql, [fName, lName, roleId, mId], (err, result) => {
       if (err) {
@@ -137,7 +132,7 @@ async function getRoleId(role) {
   });
 }
 
-async function getMrgId(manager) {
+async function getMgrId(manager) {
   const sql3 = `SELECT id FROM employees WHERE first_name = ?`;
   return new Promise((resolve, reject) => {
     if (manager === "None") {
@@ -153,6 +148,44 @@ async function getMrgId(manager) {
     }
   });
 }
+
+async function getEmpId(firstName, lastName) {
+  const sql3 = `SELECT id FROM employees WHERE first_name = ? AND last_name = ?`;
+  return new Promise((resolve, reject) => {
+      db.query(sql3, [firstName, lastName], (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].id);
+        }
+      });
+  });
+}
+
+
+//handler for updating an employee role
+app.put(`/employees/:fname/:lname/:role/`, async (req, res) => {
+  const sql = `UPDATE employees SET role_id = ? WHERE id = ?;`;
+  const fName = req.params.fname;
+  const lName = req.params.lname;
+  const role = req.params.role;
+  
+  try {
+    const roleId = await getRoleId(role);
+    const eId = await getEmpId(fName, lName);
+
+    db.query(sql, [roleId, eId], (err, result) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json(`Successfully updated ${fName} ${lName} to ${role}`);
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)

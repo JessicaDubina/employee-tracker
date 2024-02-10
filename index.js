@@ -51,9 +51,11 @@ async function mainMenu() {
             method = `POST`;
             break;
         case 'Update an employee role':
-            //put to employee table
+            let empNewRole = await updateEmployeeRole();
+            const {firstName, lastName} = splitName(empNewRole.employee);
+            selection = `employees/${firstName}/${lastName}/${empNewRole.roleEmp}`;
+            method = `PUT`;
             break;
-
         default:
             console.log('Please pick a valid option');
             return;
@@ -169,6 +171,66 @@ const addEmployee = async () => {
     ])
     const answer = newEmp;
     return answer;
+}
+
+const updateEmployeeRole = async () => {
+    const employeeUpdate = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Which employee to update?',
+            choices: [
+                'Michael Brax',
+                'Tristan Thompson',
+                'John True',
+                'Blue Heeler',
+                'Josie Feller',
+                'John Crew',
+                'Layannah Feller',
+                'Blaine Johnson',
+                'Johnny Sachue',
+                'Desiree Pom',
+                'Norina Abey',
+                'Sue Zette',
+                'Lisa Laing',
+                'Edna Merin',
+                'JC Hernandez',
+                'Tyker Noname',
+                'Nicole Rerf',
+                'Erica Del'
+            ]
+        },
+        {
+            type: 'list',
+            name: 'roleEmp',
+            message: 'Select their new role',
+            choices: [
+                'Module Engineer',
+                'Product Engineer',
+                'Manufacturing Engineer',
+                'Technician',
+                'Operations Lead',
+                'Operations Manager',
+                'Analyst',
+                'Payroll',
+                'CFO',
+                'HR Associate',
+                'HR Manager',
+                'Sales Lead',
+                'Aquisitions Manager',
+                'Marketing Analyst'
+            ]
+        }
+    ])
+    const answer = employeeUpdate;
+    return answer;
+}
+
+function splitName(name) {
+    const breakup = name.split(' ');
+    const firstName = breakup[0];
+    const lastName = breakup.slice(1).join(' ');
+    return {firstName, lastName};
 }
 
 mainMenu();
