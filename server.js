@@ -100,7 +100,33 @@ app.post(`/roles/:role/:department/:salary`, (req, res) => {
   //route back to landing
 });
 
+//handler for adding an employee
+app.post(`/employees/:fname/:lname/:role/:manager`, (req, res) => {
+  const sql = `INSERT INTO employees (first_name, last_name, role_id, manager) VALUES (?, ?, ?, ?);`;
+  const fName = req.params.fname;
+  const lName = req.params.lname;
+  const role = req.params.role;
+  const manager = req.params.manager;
+  
+  const sql2 = `SELECT id FROM roles WHERE job_title = ?`
+  const empRole = db.query(sql2, role, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+        return;
+    }
+    let roleId = result[0].id;
 
+    db.query(sql, [fName, lName, roleId, manager], (err, result) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+          return;
+      }
+        res.json(`Successfully added ${fName} ${lName}`);
+      });
+
+  });
+  //route back to landing
+});
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)

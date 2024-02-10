@@ -46,7 +46,9 @@ async function mainMenu() {
             method = `POST`;
             break;
         case 'Add an employee':
-            //post to employee table
+            let newEmp = await addEmployee();
+            selection = `employees/${newEmp.fName}/${newEmp.lName}/${newEmp.roleEmp}/${newEmp.manager}`;
+            method = `POST`;
             break;
         case 'Update an employee role':
             //put to employee table
@@ -117,6 +119,50 @@ const addRole = async () => {
     const answer = newRole;
     return answer;
 }
+
+const addEmployee = async () => {
+    const newEmp = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'fName',
+            message: 'Please enter the first name of the emplyee'
+        },
+        {
+            type: 'input',
+            name: 'lName',
+            message: 'Please enter the last name of the emplyee'
+        },
+        {
+            type: 'list',
+            name: 'roleEmp',
+            message: 'Assign a role:',
+            choices: [
+                'Module Engineer',
+                'Product Engineer',
+                'Manufacturing Engineer',
+                'Technician',
+                'Operations Lead',
+                'Operations Manager',
+                'Analyst',
+                'Payroll',
+                'CFO',
+                'HR Associate',
+                'HR Manager',
+                'Sales Lead',
+                'Aquisitions Manager',
+                'Marketing Analyst'
+            ]
+        },
+        {
+            type: 'input',
+            name: 'manager',
+            message: 'Please enter the manager if applicable'
+        },
+    ])
+    const answer = newEmp;
+    return answer;
+}
+
 
 mainMenu();
 
