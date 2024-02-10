@@ -34,7 +34,7 @@ app.get('/department', (req, res) => {
 
 //handler for roles table
 app.get('/roles', (req, res) => {
-  const sql = `SELECT * FROM roles`;
+  const sql = `SELECT roles.job_title AS job_title, roles.id AS id, department.name AS department, roles.salary AS salary FROM roles JOIN department ON roles.department_id = department.id`;
   db.query(sql, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -46,7 +46,7 @@ app.get('/roles', (req, res) => {
 
 //handler for employees table
 app.get('/employees', (req, res) => {
-  const sql = `SELECT * FROM employees`;
+  const sql = `SELECT employees.id, employees.first_name, employees.last_name, department.name AS department, roles.job_title AS job_title, roles.salary AS salary, CONCAT(manager.first_name,' ',manager.last_name) AS manager FROM employees JOIN roles ON employees.role_id = roles.id JOIN department ON roles.department_id = department.id LEFT JOIN employees manager ON employees.manager = manager.id ORDER BY employees.id`;
   db.query(sql, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
