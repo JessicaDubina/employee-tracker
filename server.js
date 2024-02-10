@@ -59,6 +59,49 @@ app.get('/employees', (req, res) => {
   //route back to landing
 });
 
+//handler for adding a department
+app.post(`/department/:name`, (req, res) => {
+  const sql = `INSERT INTO department (name) VALUES (?);`;
+  const param = req.params.name;
+  db.query(sql, param, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+       return;
+    }
+    res.json(`Successfully added ${param}`);
+  });
+  //route back to landing
+});
+
+//handler for adding a role
+app.post(`/roles/:role/:department/:salary`, (req, res) => {
+  const sql = `INSERT INTO roles (job_title, department_id, salary) VALUES (?, ?, ?);`;
+  const paramRole = req.params.role;
+  const paramDept = req.params.department;
+  const paramSal = req.params.salary;
+  
+  const sql2 = `SELECT id FROM department WHERE name = ?`
+  const roleDept = db.query(sql2, paramDept, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+        return;
+    }
+    let deptId = result[0].id
+
+    db.query(sql, [paramRole, deptId, paramSal], (err, result) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+          return;
+      }
+        res.json(`Successfully added ${paramRole}`);
+      });
+
+  });
+  //route back to landing
+});
+
+
+
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
 );

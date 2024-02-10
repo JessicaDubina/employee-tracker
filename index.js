@@ -18,7 +18,8 @@ async function mainMenu() {
                 'Add a role',
                 'Add an employee',
                 'Update an employee role'
-            ]
+            ],
+            loop: true
         }
     ])
     switch(answer.mainMenuSelect) {
@@ -36,12 +37,13 @@ async function mainMenu() {
             break;
         case 'Add a department':
             let deptName = await addDepartment();
-            selection =`department:${deptName}`
+            selection =`department/${deptName}`
             method = 'POST'
-            //post to department table
             break;
         case 'Add a role':
-            //post to roles table
+            let newRole = await addRole();
+            selection = `roles/${newRole.role}/${newRole.roleDept}/${newRole.salary}`;
+            method = `POST`;
             break;
         case 'Add an employee':
             //post to employee table
@@ -82,7 +84,38 @@ const addDepartment = async () => {
             message: 'Please enter the new department name'
         }
     ])
-    return deptName;
+    const answer = deptName['newDepartment'];
+    console.log(answer);
+    return answer;
+}
+
+const addRole = async () => {
+    const newRole = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'role',
+            message: 'Please enter the new job title'
+        },
+        {
+            type: 'list',
+            name: 'roleDept',
+            message: 'Which department does this role belong?',
+            choices: [
+                'Engineering',
+                'Operations',
+                'Finance',
+                'HR',
+                'Sales'
+            ]
+        },
+        {
+            type: 'number',
+            name: 'salary',
+            message: 'Please enter the salary'
+        },
+    ])
+    const answer = newRole;
+    return answer;
 }
 
 mainMenu();
