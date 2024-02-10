@@ -154,15 +154,22 @@ const addEmployee = async () => {
             ]
         },
         {
-            type: 'input',
+            type: 'list',
             name: 'manager',
-            message: 'Please enter the manager if applicable'
+            message: 'Please enter the manager if applicable',
+            choices: [
+                'Michael',
+                'Tristan',
+                'John',
+                'Blue',
+                'Josie',
+                'None'
+            ]
         },
     ])
     const answer = newEmp;
     return answer;
 }
-
 
 mainMenu();
 

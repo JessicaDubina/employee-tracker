@@ -101,32 +101,58 @@ app.post(`/roles/:role/:department/:salary`, (req, res) => {
 });
 
 //handler for adding an employee
-app.post(`/employees/:fname/:lname/:role/:manager`, (req, res) => {
+app.post(`/employees/:fname/:lname/:role/:manager`, async (req, res) => {
   const sql = `INSERT INTO employees (first_name, last_name, role_id, manager) VALUES (?, ?, ?, ?);`;
   const fName = req.params.fname;
   const lName = req.params.lname;
   const role = req.params.role;
   const manager = req.params.manager;
   
-  const sql2 = `SELECT id FROM roles WHERE job_title = ?`
-  const empRole = db.query(sql2, role, (err, result) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-        return;
-    }
-    let roleId = result[0].id;
+  try {
+    const roleId = await getRoleId(role);
+    const mId = await getMrgId(manager);
 
-    db.query(sql, [fName, lName, roleId, manager], (err, result) => {
+    db.query(sql, [fName, lName, roleId, mId], (err, result) => {
       if (err) {
         res.status(500).json({ error: err.message });
-          return;
+        return;
       }
-        res.json(`Successfully added ${fName} ${lName}`);
-      });
-
-  });
-  //route back to landing
+      res.json(`Successfully added ${fName} ${lName}`);
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
+
+async function getRoleId(role) {
+  const sql2 = `SELECT id FROM roles WHERE job_title = ?`;
+  return new Promise((resolve, reject) => {
+    db.query(sql2, role, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result[0].id);
+      }
+    });
+  });
+}
+
+async function getMrgId(manager) {
+  const sql3 = `SELECT id FROM employees WHERE first_name = ?`;
+  return new Promise((resolve, reject) => {
+    if (manager === "None") {
+      resolve(null);
+    } else {
+      db.query(sql3, manager, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result[0].id);
+        }
+      });
+    }
+  });
+}
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT}`)
